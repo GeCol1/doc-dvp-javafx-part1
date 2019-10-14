@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XML issu d'une conversion d'un fichier Markdown le 11/10/2019 17:51:50 --><document>
+	<!-- En-tête d'article -->
+	<entete>
+		<rubrique>1</rubrique>
+		<meta>
+			<description>Développement d'un client Desktop en JavaFX</description>
+		</meta>
+		<titre>
+			<page>Tutoriel Développement d'un client dekstop en JavaFX</page>
+			<article>Tutoriel Client en JavaFX - Partie 1</article>
+		</titre>
+		<date>2019-10-11</date>
+		<miseajour>2019-10-11</miseajour>
+		<extratag/>
+		<google-analytics/>
+		<licauteur>Colin</licauteur>
+		<lictype>2</lictype>
+		<licannee>2019</licannee>
+		<serveur>gecol1</serveur>
+		<chemin>tutoriels/java/tutoriel-client-javafx-part1</chemin>
+		<urlhttp>http://gerald-colin.developpez.com/tutoriels/java/tutoriel-client-javafx-part1/</urlhttp>
+		<pdf>
+			<sautDePageAvantSection>0</sautDePageAvantSection>
+			<notesBasPage>FinDocument</notesBasPage>
+		</pdf>
+		<microsofttraduction/>
+	</entete>
+	<!-- Auteurs, traducteurs... du tutoriel -->
+	<authorDescriptions>
+		<authorDescription name="gecol1" role="auteur">
+			<fullname>Gérald Colin</fullname>
+			<url>https://www.developpez.net/forums/u1639621/gecol1/</url>
+			<homepage>
+				<title>gecol1</title>
+				<url>https://gerald-colin.developpez.com/</url>
+			</homepage>
+		</authorDescription>
+	</authorDescriptions>
+	<synopsis>
+		<paragraph>Dans ce tutoriel, nous allons développer un client en JavaFX. A tire d'éxemple, nous dévelepperons un logiciel de gestion de portefeuille de titres financiers.</paragraph>
+		<paragraph>Vu le sujet, nous découpons en plusieurs partie et abordons ici la mise en place de l'environnement de développement, les librairies utilisées et l'affichage de la fenêtre principale.</paragraph>
+		<paragraph>
+			<lien-forum avecnote="1" id="0"/>
+		</paragraph>
+	</synopsis>
+	<soustitre>Exemple de développement d un client desktop avec JavaFX (partie 1)</soustitre>
+	<summary>
+		<section id="I">
+			<title>Développement d'un client pas si lourd avec JavaFX - partie 1</title>
+			<section id="I-A">
+				<title>Introduction</title>
+				<paragraph>Il y a quelques années, on appelait les interfaces graphiques pour desktop des clients lourds, en opposition aux clients légers qui sont dans les navigateurs. Depuis les clients légers ont pour beaucoup pris énormément de poids et peuvent venir concurrencer ces vieux clients lourds en terme de consommation de ressources.</paragraph>
+				<paragraph>Voici quelques remarques que l'on peut rencontrer autour de la machine à café sur les clients lourds Java:</paragraph>
+				<liste>
+					<element>ils ne sont pas beau: c'est vrai que des fois les développeurs n'ont pas beaucoup investis sur le UI mais quand on voit un grand nombre de sites, on se rend compte que c'est également le cas pour le web. De plus avec JavaFX, vous pouvez styler facilement en css vos applis ce qui peut donner des interfaces sympa. Regardez les 
+                        <link href="https://github.com/jfoenixadmin/JFoenix">démos de JFoenix</link> par exemple.
+                    </element>
+					<element>ils doivent passer par des processus d'installation et de mises à jour. Un des avantages du web et de sa démocratisation est le déploiement sans intervention sur le poste utilisateur. Les applications basées sur 
+                        <link href="https://electronjs.org/">Electron</link> bénéficient également de cet apport mais il existe aussi des systèmes de bootstrap pour application Java ou autres langages.
+                    </element>
+					<element>ils sont lent et consomment énormément de ressources : ce genre de remarque peu objective se retrouve dans n'importe quel langage et très souvent cela dépend de son usage et non pas d'un défaut intrinsèque.</element>
+					<element>enfin, pour cloturer cette liste sur une note positive, le principal avantage d'un client Java est de bénéficier de l'écosytème très vaste du langage.</element>
+				</liste>
+			</section>
+			<section id="I-B">
+				<title>Résumé</title>
+				<paragraph><b>Le code de l'application se trouve >></b><link href="https://github.com/Goovy/PortfolioApp/tree/part1">dans notre repo</link> <b>&lt;&lt;</b></paragraph>
+				<paragraph>Dans cette première partie, nous allons voir:</paragraph>
+				<liste>
+					<element>initialisation du code : le main,</element>
+					<element>les ressources (images, css et i18n)</element>
+					<element>les logs</element>
+					<element>un gui d'application simple</element>
+					<element>un gui d'application plus sympa (enfin cela dépend des goûts et des couleurs)</element>
+				</liste>
+			</section>
+			<section id="I-C">
+				<title>Environnement de développement et ses dépendances.</title>
+				<paragraph>Il faut un environnement de développement Java avec un IDE (IntelliJ dans mon cas), git, maven. Le code présenté a été développé avec le JDK 8.211.</paragraph>
+				<paragraph>
+					<i>Note : après Java 8, JavaFX a été sorti du JDK et fait parti d'un projet séparé :OpenJFX.</i>
+				</paragraph>
+				<paragraph>Nous utiliserons en plus les librairies/outils suivants:</paragraph>
+				<liste>
+					<element><link href="https://gluonhq.com/products/scene-builder/">scenebuilder</link> : pour dessiner les écrans de l'application. <i>Je ne suis pas un grand fan de ces outils et je préfère éditer le code manuellement mais il permet de prototyper rapidement votre GUI.</i></element>
+					<element><link href="https://github.com/JonathanGiles/scenic-view">scenicview</link> : permet la visualisation de l'arbre des composants graphique pendant le lancement de votre programme. <i>Cet outil est très utile pour le débuggage des composants graphiques et du css. C'est votre chrome dev tool pour JavaFX.</i></element>
+					<element><link href="https://github.com/edvin/fxlauncher">fxlauncher</link> : un bootstrap d'application qui permet de mettre à jour automatiquement les clients au démarrage. <i>Il est relativement simple d'utilisation et fait le job mais il ralenti le démarrage.</i></element>
+					<element><link href="https://github.com/sialcasa/mvvmFX/">mvvmfx</link> : un framework pour JavaFX. Il se rapproche du pattern MVVM de C#. <i>Je le trouve simple et efficace avec ce qu'il faut pour nos besoins actuels: séparation de la partie graphique dans les fichiers xml, de la vue et du controller (appelé model). Il apporte une injection de dépendances, un système de notification et d'évenements... Il existe <link href="https://github.com/mhrimaz/AwesomeJavaFX">plein d'autres initiatives de frameworks</link>.</i></element>
+				</liste>
+			</section>
+		</section>
+		<section id="II">
+			<title>Développement d'un outil de suivi de portefeuille financier.</title>
+			<section id="II-A">
+				<title>Les besoins</title>
+				<paragraph>Pour partir sur un exemple concret, nous allons développer une application de gestion de portefeuille (très simplifiée).
+Voici les stories que nous allons mettre en oeuvre:</paragraph>
+				<liste>
+					<element>je veux pouvoir définir par quelques caractéristiques titre financier.</element>
+					<element>je veux pouvoir acheter ou vendre ces titres à un prix et quantité fixé.</element>
+					<element>je veux pouvoir calculer la plus ou moins value réalisée sur chacun des achats/ventes.</element>
+				</liste>
+			</section>
+			<section id="II-B">
+				<title>Une première fenêtre</title>
+				<paragraph>Dans votre IDE, créez un nouveau projet Maven vide.
+                    <image alt="client01" src="./images/client01.png"/></paragraph>
+				<paragraph>Nous modifions le pom.xml pour ajouter la dépendance avec le framework 
+                    <link href="https://github.com/sialcasa/mvvmFX/">mvvmfx</link>
+Vous obtenez le pom.xml suivant:
+                </paragraph>
+				<code langage="maven" showLines="1" startLine="1"><![CDATA[    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <mvvmfx.version>1.7.0</mvvmfx.version>
+        <guice.version>4.1.0</guice.version>
+    </properties>
+
+    <!-- use resource files (fxml, css) from the java directory -->
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+	</build>
+    
+    <dependencies>
+    <!-- MVVM framework with CDI implementation -->
+        <dependency>
+            <groupId>de.saxsys</groupId>
+            <artifactId>mvvmfx</artifactId>
+            <version>${mvvmfx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.saxsys</groupId>
+            <artifactId>mvvmfx-guice</artifactId>
+            <version>${mvvmfx.version}</version>
+        </dependency>
+    </dependencies>]]></code>
+				<paragraph>Ajoutez ensuite une nouvelle classe qui sera le point d'entrée de l'application. Une application standard JavaFX hérite de  <inline>javafx.application.Application</inline>. 
+Mais comme nous utilisons MVVMFX, vous devez la faire hériter de <inline>MvvmfxGuiceApplication</inline>. Pour cet exemple, nous utilisons Guice en tant qu'implémentation d'injection des dépendances mais ce n'est pas une obligation, comme 
+                    <link href="https://github.com/sialcasa/mvvmFX/wiki/Dependency-Injection">précisé dans la documentation</link>.
+                </paragraph>
+				<paragraph>Vous devez implémenter 3 méthodes qui sont assez parlantes: init, start et stop.</paragraph>
+				<image alt="client02" src="./images/client02.png"/>
+				<paragraph>Nous complétons la méthode start pour afficher une fenêtre et obtenir un aperçu de notre dur labeur.</paragraph>
+				<code langage="java" showLines="1" startLine="1"><![CDATA[@Override
+    public void startMvvmfx(Stage stage) throws Exception {
+        stage.setTitle("Portefeuille très simplifié");
+
+        // Chargement de la vue principale
+        final ViewTuple<MainView, MainViewModel> main = FluentViewLoader.fxmlView(MainView.class).load();
+        Scene rootScene = new Scene(main.getView());
+
+        stage.setScene(rootScene);
+        stage.show();
+    }]]></code>
+				<paragraph>et n'oubliez pas d'ajouter dans la méthode void main <inline>launch(args);</inline> qui lancera JavaFX.</paragraph>
+				<paragraph>Puis il faut créer les classes correspondantes à notre première fenêtre "main" que nous plaçons dans un folder "gui". </paragraph>
+				<paragraph><b>Du fait de l'utilisation de MVVMFX, les composants graphiques sont composés de 3 fichiers:</b> </paragraph>
+				<liste>
+					<element>
+						<b>un fichier xml qui décrit l'interface graphique,</b>
+					</element>
+					<element>
+						<b>une classe de vue, aussi appelé "code behind" qui traite les événements graphiques,</b>
+					</element>
+					<element>
+						<b>une classe vue/model qui sert de lien entre les services métiers et le composant.</b>
+					</element>
+				</liste>
+				<paragraph>Vous pouvez ajouter des snippets dans IntelliJ ou Eclipse pour aller plus vite 
+                    <link href="https://github.com/sialcasa/mvvmFX/wiki/IDE-integration">comme indiqué dans la documentation</link>.
+                </paragraph>
+				<paragraph>Nous ajoutons une classe <b>MainViewModel.java</b> vide comme nous n'avons pas de code métier actuellement:</paragraph>
+				<code langage="java" showLines="1" startLine="1"><![CDATA[import de.saxsys.mvvmfx.ViewModel;
+
+public class MainViewModel implements ViewModel {
+}]]></code>
+				<paragraph>et une classe <b>MainView.java</b> vide également, avec le lien vers le controller (ViewModel) :</paragraph>
+				<code langage="text" showLines="1" startLine="1"><![CDATA[import de.saxsys.mvvmfx.FxmlView;
+import de.saxsys.mvvmfx.InjectViewModel;
+
+public class MainView implements FxmlView<MainViewModel> {
+
+    @InjectViewModel
+    private MainViewModel viewModel;
+
+    public void initialize() {
+
+    }
+}]]></code>
+				<paragraph>et enfin le fichier <b>MainView.fxml</b> avec une interface graphique très évoluée :</paragraph>
+				<code langage="xml" showLines="1" startLine="1"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainView">
+   <children>
+      <Label text="Application de gestion de portefeuille" />
+   </children>
+</AnchorPane>]]></code>
+				<paragraph>Voilà, vous pouvez déjà lancer l'application pour voir le magnifique écran avec votre label!!!</paragraph>
+			</section>
+		</section>
+		<section id="III">
+			<title>Personalisation de l'interface</title>
+			<section id="III-A">
+				<title>Ajout des logs</title>
+				<paragraph>Ajoutez les dépendances à slf4j dans le fichier pom.xml:</paragraph>
+				<code langage="text" showLines="1" startLine="1"><![CDATA[    <!-- SLF4J -->
+    <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.2.3</version>
+    </dependency>]]></code>
+				<paragraph>et dans la classe <inline>App.java</inline>, ajoutez <inline>private static final Logger LOG = LoggerFactory.getLogger(App.class);</inline>  que vous pouvez utiliser dans la méthode start avec <inline>LOG.debug("L'application démarre!");</inline>.</paragraph>
+				<paragraph>Vous pouvez configurer le logger en ajoutant un fichier logback.xml dans le répertoire resources:</paragraph>
+				<code langage="text" showLines="1" startLine="1"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date [%thread] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.dgc.finance" level="TRACE"/>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>]]></code>
+			</section>
+			<section id="III-B">
+				<title>Ajout de ressources</title>
+				<paragraph>Evitons d'hardcoder les chaînes de caractères comme nous venons de le faire et passons le tout dans des fichiers de ressources.</paragraph>
+				<paragraph>Nous ajoutons au passage une icone d'application et un lien vers un fichier CSS.
+Pour la définition des styles, n'hésitez pas à 
+                    <link href="https://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html">consulter le guide de références</link> pour connaitre les instructions CSS disponibles.
+                </paragraph>
+				<paragraph>La méthode start devient:</paragraph>
+				<code langage="java" showLines="1" startLine="1"><![CDATA[@Override
+    public void startMvvmfx(Stage stage) throws Exception {
+        LOG.debug("L'application démarre!");
+
+        // Ajout du paquet de resources par defaut pour l'i18n
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("default");
+        MvvmFX.setGlobalResourceBundle(resourceBundle);
+        stage.setTitle(resourceBundle.getString("window.title"));
+
+        // Ajout d'une icone d'application
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("/appIcon.png")));
+
+        // Chargement de la vue principale
+        final ViewTuple<MainView, MainViewModel> main = FluentViewLoader.fxmlView(MainView.class).load();
+        Scene rootScene = new Scene(main.getView());
+
+        // Ajout d'une feuille de style
+        rootScene.getStylesheets().add("/main.css");
+
+        stage.setScene(rootScene);
+        stage.show();
+    }]]></code>
+				<paragraph>et nous ajoutons une feuille de style dans les ressources avec le fichier <b>main.css</b>:</paragraph>
+				<code langage="text" showLines="1" startLine="1"><![CDATA[/* Main css file */
+.label {
+    -fx-font-family: "Courier New";
+    -fx-font-size: 12px;
+    -fx-text-fill: crimson;
+    -fx-background-color: aquamarine;
+}]]></code>
+				<paragraph>et pour utiliser les resources textes dans le fichier fxml, utilisez "%" devant la clé: <inline>&lt;Label text="%text.intro" /></inline>.</paragraph>
+				<paragraph>Voici l'arborescence des fichiers obtenue :</paragraph>
+				<image alt="client03-1" src="./images/client03-1.png"/>
+			</section>
+			<section id="III-C">
+				<title>Un GUI d'application simple et classique</title>
+				<paragraph>Pour dessiner le GUI, nous allons personnaliser le MainView.fxml à l'aide de 
+                    <link href="http://gluonhq.com/products/scene-builder/">scene-builder</link>. Celui-ci peut-être lancé dans l'IDE ou bien séparemment.
+Nous remplaçons la balise <inline>AnchorPane</inline> par un <inline>BorderPane</inline> qui découpe de façon classique l'interface main et utilisons les instructions <inline>&lt;fx:include ...></inline> pour le composant menu et sous-menu.
+                </paragraph>
+				<paragraph>Le MainView.fxml devient:</paragraph>
+				<code langage="text" showLines="1" startLine="1"><![CDATA[<BorderPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.MainView">
+    <!-- Barre de menu -->
+    <top>
+        <fx:include source="../menu/MenuView.fxml" />
+    </top>
+    <!-- Sous-menu de navigation -->
+    <left>
+        <fx:include source="../navigation/NavigationView.fxml" />
+    </left>
+    <!-- Contenu principale -->
+    <center>
+        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <tabs>
+                <Tab text="Untitled Tab 1">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                            <children>
+
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+                <Tab text="Untitled Tab 2">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                            <children>
+
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+    <!-- Barre de notification -->
+    <bottom>
+        <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" BorderPane.alignment="CENTER">
+            <children>
+                <Label maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="This is the left side." HBox.hgrow="ALWAYS">
+                    <font>
+                        <Font size="11.0" fx:id="x3" />
+                    </font>
+                    <textFill>
+                        <Color blue="0.625" green="0.625" red="0.625" fx:id="x4" />
+                    </textFill>
+                </Label>
+                <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
+                <Label font="$x3" maxWidth="-1.0" text="This is the right side." textFill="$x4" HBox.hgrow="NEVER" />
+            </children>
+            <padding>
+                <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+            </padding>
+        </HBox>
+    </bottom>
+</BorderPane>]]></code>
+				<paragraph>Créez les 3 fichiers (Vue, VueModèle et xml) pour le menu et le sous-menu.
+Le fichier <b>MenuView.fxml</b> contient la description du menu et de ses entrées :</paragraph>
+				<code langage="text" showLines="1" startLine="1"><![CDATA[<AnchorPane maxHeight="-Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="gui.menu.MenuView">
+
+    <children>
+        <MenuBar AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                 AnchorPane.topAnchor="0.0">
+            <menus>
+                <Menu mnemonicParsing="false" text="%menu.file">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="%menu.quit" onAction="#quit" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="%menu.help">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#about" text="%menu.about" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </children>
+</AnchorPane>]]></code>
+				<paragraph>et le "code-behind" MenuView.java récupère le stage principale pour pouvoir le fermer par l'action définit dans le fichier xml avec l'attribut <inline>onAction</inline> et un # suivi du nom de la méthode.</paragraph>
+				<code langage="java" showLines="1" startLine="1"><![CDATA[public class MenuView implements FxmlView<MenuViewModel> {
+
+    @InjectViewModel
+    private MenuViewModel viewModel;
+
+    @Inject
+    Stage primaryStage;
+
+    public void initialize() {
+
+    }
+
+    public void quit(ActionEvent actionEvent) {
+        primaryStage.close();
+    }
+
+    public void about(ActionEvent actionEvent) {
+    }
+}]]></code>
+			</section>
+			<section id="III-D">
+				<title>Un GUI propre et moderne (Material UI)</title>
+				<paragraph>Notre interface graphique est simple et efficace mais son look ne fait pas trop moderne. Nous allons le changer pour appliquer les principes de 
+                    <link href="https://material.io/design/">material design</link> définis par les équipe de Google.
+                </paragraph>
+				<paragraph>Pour cela, nous allons utiliser la librairie Java 
+                    <link href="http://www.jfoenix.com/">JFoeniX</link> à inclure dans le <b>pom.xml</b>:
+                </paragraph>
+				<code langage="text" showLines="1" startLine="1"><![CDATA[<dependency>
+    <groupId>com.jfoenix</groupId>
+    <artifactId>jfoenix</artifactId>
+    <version>8.0.4</version>
+</dependency>]]></code>
+			</section>
+			<section id="III-E">
+				<title>Fenetre principale</title>
+				<paragraph>Nous ajoutons les CSS et polices de caractères propres au material design:</paragraph>
+				<image alt="client04" src="./images/client04.png"/>
+				<paragraph>Au début du fichier <b>material-ui.css</b>, nous ajoutons le chargement des fonts avec</paragraph>
+				<code langage="text" showLines="1" startLine="1"><![CDATA[@import url("jfoenix-fonts.css");
+
+.root {
+    -fx-font-family: "Roboto";
+}]]></code>
+				<paragraph>et nous modifions le fichier <b>App.java</b> pour utiliser le <inline>JFXDecorator</inline> et charger les feuilles de style:</paragraph>
+				<code langage="java" showLines="1" startLine="1"><![CDATA[    // Chargement de la vue principale
+    final ViewTuple<MainView, MainViewModel> main = FluentViewLoader.fxmlView(MainView.class).load();
+    JFXDecorator jfxDecorator = new JFXDecorator(stage, main.getView());
+    // pour ne pas cacher la barre de tache windows quand maximisé
+    jfxDecorator.setCustomMaximize(true);
+    // pour ajouter une icone à gauche du titre. Le SVG est défini en css par l'atttribut --fx-shape.
+    jfxDecorator.setGraphic(new SVGGlyph());
+    Scene rootScene = new Scene(jfxDecorator);
+
+    // Ajout d'une feuille de style
+    rootScene.getStylesheets().add("/css/material-ui.css");
+    rootScene.getStylesheets().add("/css/main.css");]]></code>
+			</section>
+			<section id="III-F">
+				<title>Le menu et sous menu</title>
+				<paragraph>Pour le menu, nous reprenons le principe des applications basées sur 
+                    <link href="https://electronjs.org/docs/tutorial/about">electron</link> qui est de cacher la barre de menu disgracieuse par défaut et de l'afficher avec le bouton "Alt" (pas testé sous Mac).
+                </paragraph>
+				<paragraph>Nous commençons par créer un material menu avec la partie menu bar classique et la partie toolbar de la librairie JFoeniX. Voici la vue <b>MenuView.fxml</b></paragraph>
+				<code langage="text" showLines="1" startLine="1"><![CDATA[<AnchorPane maxHeight="-Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            xmlns="http://javafx.com/javafx/8.0.121"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="gui.material_menu.MenuView">
+   <children>
+      <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+            fx:id="menuPane">
+         <children>
+            <!-- Keep the menubar like in Electron -->
+            <MenuBar fx:id="menuBar">
+               <menus>
+                  <Menu mnemonicParsing="false" text="%menu.file">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="%menu.quit" onAction="#quit" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="%menu.help">
+                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#about" text="%menu.about" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+            <!-- Add the material top bar -->
+            <JFXToolbar>
+               <leftItems>
+                  <JFXRippler maskType="CIRCLE" style="-fx-ripple-color:WHITE;">
+                     <StackPane fx:id="titleBurgerContainer">
+                        <JFXHamburger fx:id="titleBurger">
+                           <HamburgerSlideCloseTransition/>
+                        </JFXHamburger>
+                     </StackPane>
+                  </JFXRippler>
+                  <Label text="%section.title.dashboard"></Label>
+               </leftItems>
+            </JFXToolbar>
+
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>]]></code>
+				<paragraph>Pour afficher et cacher le menu, nous allons utiliser la librairie 
+                    <link href="https://github.com/kwhat/jnativehook">jnativehook</link> en ajoutant la dépendance dans notre <b>pom.xml</b> :
+                </paragraph>
+				<code langage="text" showLines="1" startLine="1"><![CDATA[<dependency>
+    <groupId>com.1stleg</groupId>
+    <artifactId>jnativehook</artifactId>
+    <version>RELEASE</version>
+</dependency>]]></code>
+				<paragraph>Nous créons un listener qui implémente cette librairie et qui va notifier une partie de l'application que la touche Alt a été pressée.</paragraph>
+				<code langage="java" showLines="1" startLine="1"><![CDATA[public class KeyListener implements NativeKeyListener {
+
+    public KeyListener() { }
+
+    @Override
+    public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) { }
+
+    @Override
+    public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
+        if (nativeKeyEvent.getKeyCode()==NativeKeyEvent.VC_ALT) {
+            App.getKeyEventBus().post("AltKeyPressed");
+        }
+    }
+
+    @Override
+    public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) { }
+}]]></code>
+				<paragraph>Pour la notification, nous utilisons l'event bus de 
+                    <link href="https://github.com/google/guava/wiki/EventBusExplained">Guava</link>. Nous modifions donc notre class <inline>App</inline> en ajoutant l'initialisation de l'event bus:
+                </paragraph>
+				<code langage="java" showLines="1" startLine="1"><![CDATA[    // EventBus using Guava
+    private static EventBus eventBus = new EventBus("Key_Pressed_event_bus");
+
+    public static EventBus getKeyEventBus() {
+        return eventBus;
+    }]]></code>
+				<paragraph>Puis dans notre ViewModel du menu nous écoutons le bus pour ces messages et nous informons la vue d'afficher/cacher la barre de menu via le mécanisme de notifications de mvvmfx. 
+Nous reviendrons dans une seconde partie sur les mécanismes de notifications internes apportés par MVVMFX.</paragraph>
+				<code langage="java" showLines="1" startLine="1"><![CDATA[public class MenuViewModel implements ViewModel {
+    private static final Logger LOG = LoggerFactory.getLogger(MenuViewModel.class);
+
+    public static final String SHOW_HIDE_MENU = "ShowHide_Navigation_Menu";
+
+    public void initialize() {
+        // On souscrit aux notifications de la touche Alt
+        App.getKeyEventBus().register(this);
+    }
+
+    @Subscribe
+    public void altKeyPressedEvent(String event) {
+        if (event.equals("AltKeyPressed")) {
+            LOG.debug("Received event Alt key pressed");
+            publish(SHOW_HIDE_MENU);
+        }
+    }
+}]]></code>
+				<paragraph>Nous complétons la vue <b>MenuView.java</b> pour traiter l'evenement provenant du controller:
+```Java
+    private boolean isMenuShowed = false;</paragraph>
+				<code langage="text" showLines="1" startLine="1"><![CDATA[public void initialize() {
+    // par défaut le menu est caché et il est affiché en appuyant sur la touche Alt
+    hideMenuBar();
+    viewModel.subscribe(MenuViewModel.SHOW_HIDE_MENU, (k, v) -> showHideMenuBar());
+}
+
+private void showHideMenuBar() {
+    if (isMenuShowed) {
+        hideMenuBar();
+    } else {
+        showMenuBar();
+    }
+}
+
+private void showMenuBar() {
+    menuPane.getChildren().add(0, menuBar);
+    isMenuShowed = true;
+}
+
+private void hideMenuBar() {
+    menuPane.getChildren().remove(menuBar);
+    isMenuShowed = false;
+}]]></code>
+				<paragraph>```</paragraph>
+			</section>
+			<section id="III-G">
+				<title>Hamburger du menu</title>
+				<paragraph>Nous implémentons maintenant l'affichage de la sous-navigation dans un paneau rétractable à gauche en appuyant sur l'icone avec les 3 barres horizontales (hamburger).</paragraph>
+				<paragraph>Nous ajoutons le click sur le hamburger dans le fichier <b>MenuView.fxml</b> <inline>&lt;StackPane fx:id="titleBurgerContainer" styleClass="hamburger-icon" onMouseClicked="#hamburgerClicked"></inline>.
+Dans la vue, nous notifions simplement le controller </paragraph>
+				<code langage="java" showLines="1" startLine="1"><![CDATA[    public void hamburgerClicked(MouseEvent mouseEvent) {
+        viewModel.notifyShowHideSidePane();
+    }]]></code>
+				<paragraph>et dans le controller, nous notifions via une notification par scope du framework mvvmfx, le Main controller (sous oublier d'injecter le scope) <inline>public void notifyShowHideSidePane() { menuScope.publish(MenuScope.SIDE_PANE); }</inline>.</paragraph>
+				<paragraph>Le MenuScope est une simple classe qui hérite de <inline>Scope</inline> et qui contient seulement une constante pour identifier l'événement. Vous pouvez passer dans le corps du message plus d'informations/objets et nous verrons cela dans un second tutoriel.</paragraph>
+				<code langage="java" showLines="1" startLine="1"><![CDATA[public class MenuScope implements Scope {
+    public static final String SIDE_PANE = "SIDE_PANE";
+}]]></code>
+				<paragraph>Dans le controller principal, nous ajoutons une souscription à ce scope et nous informons la vue d'actionner le sous-menu.</paragraph>
+				<code langage="java" showLines="1" startLine="1"><![CDATA[@ScopeProvider(scopes = {MenuScope.class})
+public class MainViewModel implements ViewModel {
+    public static final String SIDE_PANE = "Show/Hide side pane";
+
+    @InjectScope
+    MenuScope menuScope;
+
+    public void initialize() {
+        menuScope.subscribe(MenuScope.SIDE_PANE, (k,v) -> publish(SIDE_PANE));
+    }
+}]]></code>
+				<paragraph>Dans la vue principale <b>MainView.java</b> nous ajoutons la souscription à l'événement du controller et l'initialisation des vues à afficher.</paragraph>
+				<code langage="java" showLines="1" startLine="1"><![CDATA[public class MainView implements FxmlView<MainViewModel> {
+
+    public JFXDrawer drawer;
+
+    @InjectViewModel
+    private MainViewModel viewModel;
+
+    public void initialize() {
+        final ViewTuple navigationView = FluentViewLoader.fxmlView(NavigationView.class).load();
+        drawer.setSidePane(navigationView.getView());
+        drawer.setOverLayVisible(false);
+        viewModel.subscribe(MainViewModel.SIDE_PANE, (k,v) -> openCloseSidePane());
+        // Affichage du conteneur qui contient le contenu ou aussi appelé contenant
+        final ViewTuple contentView = FluentViewLoader.fxmlView(ContentView.class).load();
+        drawer.setContent(contentView.getView());
+    }
+
+    private void openCloseSidePane() {
+        if (drawer.isClosed() || drawer.isClosing()) {
+            drawer.open();
+        } else {
+            drawer.close();
+        }
+    }
+}]]></code>
+				<paragraph>et le fichier XML de la vue a été simplifié</paragraph>
+				<code langage="text" showLines="1" startLine="1"><![CDATA[[...]
+    <!-- Barre de menu -->
+   <top>
+      <fx:include source="../material_menu/MenuView.fxml" />
+   </top>
+   <!-- Contenu principal -->
+   <center>
+      <JFXDrawer fx:id="drawer" defaultDrawerSize="180" direction="LEFT" styleClass="body">
+      </JFXDrawer>
+   </center>
+[...]]]></code>
+			</section>
+		</section>
+		<section id="IV">
+			<title>Conclusion partie 1</title>
+			<paragraph>A ce stade, vous devriez avoir une application qui ressemble à ceci (sinon récupérez la du 
+                <link href="https://github.com/Goovy/PortfolioApp/tree/part1">repo</link>).
+Par contre les stories n'ont pas été répondues. Il s'agissait du sprint 1 de mise en place de l'architecture technique.
+            </paragraph>
+			<image alt="client10" src="./images/client10.png"/>
+			<image alt="client12" src="./images/client12.png"/>
+			<section id="IV-A">
+				<title>Remerciements</title>
+				<paragraph>D'abord j'adresse mes remerciements aux équipes derrière MVVMFX et les autres librairies utilisées et aussi à GluonHQ qui reprend le flambeau de JavaFX après son abandon par Oracle. Je n'oublie pas tous les contributeurs qui participent.</paragraph>
+				<paragraph>Plus spécifiquement en ce qui concerne cet article, je tiens à remercier mon binome de toujours 
+                    <link href="https://www.kiadra.com/">Denis Garcia</link>, l'équipe de Developpez.com et plus particulièrement 
+                    <link href="https://www.developpez.net/forums/u69211/mickael-baron/">Mickael Baron</link> pour son aide et accompagnement.
+                </paragraph>
+			</section>
+		</section>
+	</summary>
+</document>
