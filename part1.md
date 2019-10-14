@@ -1,8 +1,10 @@
 # Synopsis
 
-Dans ce tutoriel, nous allons développer un client en JavaFX. A tire d'éxemple, nous dévelepperons un logiciel de gestion de portefeuille de titres financiers.
+Dans ce tutoriel, nous allons développer un client "lourd" en JavaFX. A tire d'éxemple, nous développerons un logiciel de gestion de portefeuille de titres financiers.
 
-Vu le vaste sujet, nous découpons en plusieurs parties et abordons ici la mise en place de l'environnement de développement, les librairies utilisées et nous verrons l'affichage de la fenêtre principale.
+Vu le vaste sujet, nous découpons ce guide en plusieurs parties et abordons ici la mise en place de l'environnement de développement, les librairies utilisées et nous verrons l'affichage de la fenêtre principale.
+
+Bonne lecture !
 
 [forumdvp][0]
 
@@ -21,7 +23,7 @@ Voici quelques remarques que l'on peut rencontrer autour de la machine à café 
 
 
 ## Résumé
-**Le code de l'application se trouve >>** [ dans notre repo ](https://github.com/Goovy/PortfolioApp/tree/part1) **<<** 
+**Le code de l'application se trouve **[ dans notre repo ](https://github.com/Goovy/PortfolioApp/tree/part1)** 
 
 Dans cette première partie, nous allons voir:
 
@@ -100,8 +102,11 @@ Vous obtenez le pom.xml suivant:
 ```
 
 
-Ajoutez ensuite une nouvelle classe qui sera le point d'entrée de l'application. Une application standard JavaFX hérite de  `javafx.application.Application`. 
-Mais comme nous utilisons MVVMFX, vous devez la faire hériter de `MvvmfxGuiceApplication`. Pour cet exemple, nous utilisons Guice en tant qu'implémentation d'injection des dépendances mais ce n'est pas une obligation, comme [précisé dans la documentation](https://github.com/sialcasa/mvvmFX/wiki/Dependency-Injection).
+Ajoutez ensuite une nouvelle classe qui sera le point d'entrée de l'application. 
+
+Une application standard JavaFX hérite de  `javafx.application.Application`. 
+Mais comme nous utilisons MVVMFX, vous devez la faire hériter de `MvvmfxGuiceApplication`. 
+Pour cet exemple, nous utilisons Guice en tant qu'implémentation d'injection des dépendances mais ce n'est pas une obligation, comme [précisé dans la documentation](https://github.com/sialcasa/mvvmFX/wiki/Dependency-Injection).
 
 Vous devez implémenter 3 méthodes qui sont assez parlantes: init, start et stop.
 
@@ -190,6 +195,8 @@ Voilà, vous pouvez déjà lancer l'application pour voir le magnifique écran a
 
 # Personalisation de l'interface
 
+Nous allons maintenant ajouter quelques éléments de structure à notre application.
+
 ## Ajout des logs
 
 Ajoutez les dépendances à slf4j dans le fichier pom.xml:
@@ -225,13 +232,14 @@ Vous pouvez configurer le logger en ajoutant un fichier logback.xml dans le rép
     </root>
 </configuration>
 ```
-
+_Note: vous pouvez aussi utiliser lombok en vous aidant de cet [excellent tuto](https://fxrobin.developpez.com/tutoriels/java/lombok-retour-experience/) dispo sur développez.com_
 
 ## Ajout de ressources
-Evitons d'hardcoder les chaînes de caractères comme nous venons de le faire et passons le tout dans des fichiers de ressources.
+Evitons d'hardcoder les chaînes de caractères comme nous venons de le faire et passons le tout dans des fichiers de ressources. Cela vous sera d'autant plus utile si vous souhaiter ajouter du multi-langue.
 
 Nous ajoutons au passage une icone d'application et un lien vers un fichier CSS.
-Pour la définition des styles, n'hésitez pas à [consulter le guide de références](https://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html) pour connaitre les instructions CSS disponibles.
+
+Pour les composants JavaFX, le CSS aura des balises spécifiques. Vous pouvez retrouver leur définition dans [le guide de références](https://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html).
 
 La méthode start devient:
 
@@ -458,250 +466,7 @@ et nous modifions le fichier **App.java** pour utiliser le `JFXDecorator` et cha
     rootScene.getStylesheets().add("/css/main.css");
 ```
 
-## Le menu et sous menu
 
-Pour le menu, nous reprenons le principe des applications basées sur [electron](https://electronjs.org/docs/tutorial/about) qui est de cacher la barre de menu disgracieuse par défaut et de l'afficher avec le bouton "Alt" (pas testé sous Mac).
-
-Nous commençons par créer un material menu avec la partie menu bar classique et la partie toolbar de la librairie JFoeniX. Voici la vue **MenuView.fxml**
-
-
-```
-<AnchorPane maxHeight="-Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity"
-            xmlns="http://javafx.com/javafx/8.0.121"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="gui.material_menu.MenuView">
-   <children>
-      <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
-            fx:id="menuPane">
-         <children>
-            <!-- Keep the menubar like in Electron -->
-            <MenuBar fx:id="menuBar">
-               <menus>
-                  <Menu mnemonicParsing="false" text="%menu.file">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="%menu.quit" onAction="#quit" />
-                     </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="%menu.help">
-                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#about" text="%menu.about" />
-                     </items>
-                  </Menu>
-               </menus>
-            </MenuBar>
-            <!-- Add the material top bar -->
-            <JFXToolbar>
-               <leftItems>
-                  <JFXRippler maskType="CIRCLE" style="-fx-ripple-color:WHITE;">
-                     <StackPane fx:id="titleBurgerContainer">
-                        <JFXHamburger fx:id="titleBurger">
-                           <HamburgerSlideCloseTransition/>
-                        </JFXHamburger>
-                     </StackPane>
-                  </JFXRippler>
-                  <Label text="%section.title.dashboard"></Label>
-               </leftItems>
-            </JFXToolbar>
-
-         </children>
-      </VBox>
-   </children>
-</AnchorPane>
-```
-
-
-Pour afficher et cacher le menu, nous allons utiliser la librairie [jnativehook](https://github.com/kwhat/jnativehook) en ajoutant la dépendance dans notre **pom.xml** :
-
-
-```
-<dependency>
-    <groupId>com.1stleg</groupId>
-    <artifactId>jnativehook</artifactId>
-    <version>RELEASE</version>
-</dependency>
-```
-
-Nous créons un listener qui implémente cette librairie et qui va notifier une partie de l'application que la touche Alt a été pressée.
-
-
-```Java
-public class KeyListener implements NativeKeyListener {
-
-    public KeyListener() { }
-
-    @Override
-    public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) { }
-
-    @Override
-    public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
-        if (nativeKeyEvent.getKeyCode()==NativeKeyEvent.VC_ALT) {
-            App.getKeyEventBus().post("AltKeyPressed");
-        }
-    }
-
-    @Override
-    public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) { }
-}
-```
-
-Pour la notification, nous utilisons l'event bus de [Guava](https://github.com/google/guava/wiki/EventBusExplained). Nous modifions donc notre class `App` en ajoutant l'initialisation de l'event bus:
-
-
-```Java
-    // EventBus using Guava
-    private static EventBus eventBus = new EventBus("Key_Pressed_event_bus");
-
-    public static EventBus getKeyEventBus() {
-        return eventBus;
-    }
-```
-
-Puis dans notre ViewModel du menu nous écoutons le bus pour ces messages et nous informons la vue d'afficher/cacher la barre de menu via le mécanisme de notifications de mvvmfx. 
-Nous reviendrons dans une seconde partie sur les mécanismes de notifications internes apportés par MVVMFX.
-
-
-```Java
-public class MenuViewModel implements ViewModel {
-    private static final Logger LOG = LoggerFactory.getLogger(MenuViewModel.class);
-
-    public static final String SHOW_HIDE_MENU = "ShowHide_Navigation_Menu";
-
-    public void initialize() {
-        // On souscrit aux notifications de la touche Alt
-        App.getKeyEventBus().register(this);
-    }
-
-    @Subscribe
-    public void altKeyPressedEvent(String event) {
-        if (event.equals("AltKeyPressed")) {
-            LOG.debug("Received event Alt key pressed");
-            publish(SHOW_HIDE_MENU);
-        }
-    }
-}
-```
-
-Nous complétons la vue **MenuView.java** pour traiter l'evenement provenant du controller:
-```Java
-    private boolean isMenuShowed = false;
-
-    public void initialize() {
-        // par défaut le menu est caché et il est affiché en appuyant sur la touche Alt
-        hideMenuBar();
-        viewModel.subscribe(MenuViewModel.SHOW_HIDE_MENU, (k, v) -> showHideMenuBar());
-    }
-
-    private void showHideMenuBar() {
-        if (isMenuShowed) {
-            hideMenuBar();
-        } else {
-            showMenuBar();
-        }
-    }
-
-    private void showMenuBar() {
-        menuPane.getChildren().add(0, menuBar);
-        isMenuShowed = true;
-    }
-
-    private void hideMenuBar() {
-        menuPane.getChildren().remove(menuBar);
-        isMenuShowed = false;
-    }
-```
-
-## Hamburger du menu
-
-Nous implémentons maintenant l'affichage de la sous-navigation dans un paneau rétractable à gauche en appuyant sur l'icone avec les 3 barres horizontales (hamburger).
-
-Nous ajoutons le click sur le hamburger dans le fichier **MenuView.fxml** `<StackPane fx:id="titleBurgerContainer" styleClass="hamburger-icon" onMouseClicked="#hamburgerClicked">`.
-Dans la vue, nous notifions simplement le controller 
-
-
-```Java
-    public void hamburgerClicked(MouseEvent mouseEvent) {
-        viewModel.notifyShowHideSidePane();
-    }
-```
-
-et dans le controller, nous notifions via une notification par scope du framework mvvmfx, le Main controller (sous oublier d'injecter le scope) `public void notifyShowHideSidePane() { menuScope.publish(MenuScope.SIDE_PANE); }`.
-
-Le MenuScope est une simple classe qui hérite de `Scope` et qui contient seulement une constante pour identifier l'événement. Vous pouvez passer dans le corps du message plus d'informations/objets et nous verrons cela dans un second tutoriel.
-
-
-```Java
-public class MenuScope implements Scope {
-    public static final String SIDE_PANE = "SIDE_PANE";
-}
-```
-
-
-Dans le controller principal, nous ajoutons une souscription à ce scope et nous informons la vue d'actionner le sous-menu.
-
-
-```Java
-@ScopeProvider(scopes = {MenuScope.class})
-public class MainViewModel implements ViewModel {
-    public static final String SIDE_PANE = "Show/Hide side pane";
-
-    @InjectScope
-    MenuScope menuScope;
-
-    public void initialize() {
-        menuScope.subscribe(MenuScope.SIDE_PANE, (k,v) -> publish(SIDE_PANE));
-    }
-}
-```
-
-
-Dans la vue principale **MainView.java** nous ajoutons la souscription à l'événement du controller et l'initialisation des vues à afficher.
-
-
-```Java
-public class MainView implements FxmlView<MainViewModel> {
-
-    public JFXDrawer drawer;
-
-    @InjectViewModel
-    private MainViewModel viewModel;
-
-    public void initialize() {
-        final ViewTuple navigationView = FluentViewLoader.fxmlView(NavigationView.class).load();
-        drawer.setSidePane(navigationView.getView());
-        drawer.setOverLayVisible(false);
-        viewModel.subscribe(MainViewModel.SIDE_PANE, (k,v) -> openCloseSidePane());
-        // Affichage du conteneur qui contient le contenu ou aussi appelé contenant
-        final ViewTuple contentView = FluentViewLoader.fxmlView(ContentView.class).load();
-        drawer.setContent(contentView.getView());
-    }
-
-    private void openCloseSidePane() {
-        if (drawer.isClosed() || drawer.isClosing()) {
-            drawer.open();
-        } else {
-            drawer.close();
-        }
-    }
-}
-```
-
-
-et le fichier XML de la vue a été simplifié
-
-
-```
-[...]
-    <!-- Barre de menu -->
-   <top>
-      <fx:include source="../material_menu/MenuView.fxml" />
-   </top>
-   <!-- Contenu principal -->
-   <center>
-      <JFXDrawer fx:id="drawer" defaultDrawerSize="180" direction="LEFT" styleClass="body">
-      </JFXDrawer>
-   </center>
-[...]
-```
 
 # Conclusion partie 1
 
